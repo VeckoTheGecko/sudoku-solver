@@ -65,7 +65,7 @@ class TestSudoku(TestCase):
             [0, 0, 0, 0, 0, 0, 0, 0, 5]
         ]
         grid = np.array(grid, dtype=np.int8)
-        self.sudoku.load_grid(grid)
+        self.sudoku.record_preoccupied_cells(grid)
 
         expected_prepopulated = {(0, 0), (0, 1), (0, 2), (0, 3), (8, 8)}
 

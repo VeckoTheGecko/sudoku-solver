@@ -1,12 +1,11 @@
 from typing import Tuple
-
 import numpy as np
 
-from exceptions import LastMoveException
+from views import CommandView
 
 
 class Sudoku:
-    def __init__(self, view=None, sudoku_path=None):
+    def __init__(self, view, sudoku_path=None):
         """A function to initialise the sudoku given a view and a sudoku_path.
 
         :param view: A view object that is capable of rendering the scene.
@@ -16,40 +15,39 @@ class Sudoku:
 
         # List[List] Making a list of lists
         if sudoku_path is not None:
-            self.load_grid(np.fromfile(sudoku_path, dtype=np.int8))
+            self.grid = self.read_grid(sudoku_path)
             assert self.grid.shape == (
                 9, 9), "The sudoku file is of improper dimensions"
 
-        self.load_grid(np.zeros(shape=(9, 9), dtype=np.int8))
+        else:
+            self.grid = np.zeros(shape=(9, 9), dtype=np.int8)
 
-        self.last_move = None
+        self.record_preoccupied_cells()
 
-    def load_grid(self, grid: np.ndarray) -> None:
-        """Loads the grid (given with 0s as blanks and numbers as populated values). The function defines self.grid and self.prepopulated."""
-        self.grid = grid
+    def read_grid(self, path):
+        """Reads in the grid (given with 0s as blanks and numbers as populated values)."""
+        with open(path, 'r', encoding="utf-8") as file:
+            content = file.read().strip().splitlines()
+        content = [[int(cell) for cell in row] for row in content]
 
+        return np.array(content, dtype=np.int8)
+
+    def record_preoccupied_cells(self) -> None:
+        """Given the grid, generates a list of the cells that are preoccupied."""
         populated_set = set()
-        for row_index, row in enumerate(grid):
-            for col_index, col in enumerate(row):
-                if grid[row_index, col_index] != 0:
+        for row_index in range(len(self.grid)):
+            for col_index in range(len(self.grid[row_index])):
+                if self.grid[row_index, col_index] != 0:
                     populated_set.add((row_index, col_index))
 
         self.prepopulated = populated_set
         return
 
-    def set_last_move(self, last_move: Tuple[int, int]) -> None:
-        """Records the position of the cell that was changed last."""
-        self.last_move = last_move
-        return
-
-    def is_valid(self) -> bool:
+    def is_valid(self, last_move) -> bool:
         """Examines the sudoku board around the last entry and determines whether
         the board is valid."""
 
-        if self.last_move is None:
-            raise LastMoveException("Last move has not been properly recorded")
-        else:
-            row_index, col_index = self.last_move
+        row_index, col_index = last_move
 
         row = self.grid[row_index, :]  # Contructing the row to be tested
         col = self.grid[:, col_index]  # Constructing the column to be tested
@@ -77,14 +75,49 @@ class Sudoku:
 
     def between_iteration(self):
         """A function that is called between a new item is guessed in the sudoku grid."""
+        self.view.render(self.grid)
         return
 
-    def solve(self):
+    def when_done(self):
+        """A function that is called the final result is determined."""
+        return
+
+    def solve(self, row=0, col=0):
         """An implementation of the backtracking algorithm using recursion."""
+        # Defining escape conditions
+        if col < 0:  # Going to the previous row
+            return self.solve(row - 1, 8)
+
+        elif col > 8:  # Going to the next row
+            return self.solve(row + 1, 0)
+
+        if row < 0:  # Unsolvable!
+            self.between_iteration()
+            print("Unsolvable")
+            return True
+
+        elif row > 8:  # Finished!
+            self.between_iteration()
+            print("DONE!")
+            return True
+
+        if (row, col) in self.prepopulated:  # Just move on
+            return self.solve(row, col + 1)
+
+        # Guessing
+        for guess in range(1, 10):
+            self.grid[row, col] = guess
+            self.between_iteration()
+            if self.is_valid((row, col)):
+                if self.solve(row, col + 1):
+                    return True
+
+        self.grid[row, col] = 0  # Resetting the value for the backtracking
+        self.between_iteration()  # Temp
+        return False
 
 
 if __name__ == "__main__":
-    sudoku = Sudoku()
-    sudoku.grid[6:, 6:] = np.array([[0, 0, 4], [4, 5, 6], [7, 8, 9]])
-    sudoku.set_last_move((7, 7))
-    print(sudoku.is_valid())
+    view = CommandView(delay=0.0001)
+    sudoku = Sudoku(view, sudoku_path="sudokus/2.txt")
+    sudoku.solve()
