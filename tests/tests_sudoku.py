@@ -1,11 +1,11 @@
 from unittest import TestCase
 import numpy as np
-from sudoku import Sudoku
+from src.sudoku import Sudoku
 
 
 class TestSudoku(TestCase):
     def setUp(self) -> None:
-        # Initialising 6 boards
+        # Initializing 6 boards
         self.sudoku = Sudoku()
 
     def test_row(self):
@@ -49,3 +49,24 @@ class TestSudoku(TestCase):
         self.sudoku.grid[6:, 6:] = np.array([[0, 0, 4], [4, 5, 6], [7, 8, 9]])
         self.sudoku.set_last_move((7, 7))
         self.assertFalse(self.sudoku.is_valid())
+
+    def test_load_grid(self):
+        grid = [
+            [1, 2, 3, 4, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 5]
+        ]
+        grid = np.array(grid, dtype=np.int8)
+        self.sudoku.load_grid(grid)
+
+        expected_prepopulated = {(0, 0), (0, 1), (0, 2), (0, 3), (8, 8)}
+
+        self.assertEqual(self.sudoku.prepopulated, expected_prepopulated)
+
+        return

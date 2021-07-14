@@ -7,3 +7,7 @@ A sudoku solver with a GUI that allows a user to enter in a partially completed 
 # Future development?
 - Different solving algorithms
 - Allow for different sudoku variations to be specified by the user, and then solved (maybe each mode can be saved by the user? Reading from a folder of .json files?)
+
+
+# Resources
+Test sudokus obtained from https://github.com/dimitri/sudoku/blob/master/sudoku.txt.
