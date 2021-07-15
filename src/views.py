@@ -15,7 +15,7 @@ class CommandView:
         "bottom": "+---+---+---+",  # "└───┴───┴───┘"}
     }
 
-    def __init__(self, delay: float):
+    def __init__(self, delay: float = None):
         """A view used to render in the terminal.
         :param delay: number of seconds between grid re-render refreshes."""
 
@@ -38,6 +38,7 @@ class CommandView:
 
         if print_bool:
             print(to_print, flush=True)
-            time.sleep(self.delay)
+            if self.delay is not None:
+                time.sleep(self.delay)
 
         return to_print

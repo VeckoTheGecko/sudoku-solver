@@ -80,31 +80,24 @@ class Sudoku:
 
     def when_done(self):
         """A function that is called the final result is determined."""
+        print("We're done now!!")
         return
 
     def solve(self, row=0, col=0):
         """An implementation of the backtracking algorithm using recursion."""
-        # Defining escape conditions
-        if col < 0:  # Going to the previous row
-            return self.solve(row - 1, 8)
-
-        elif col > 8:  # Going to the next row
+        # Defining progression conditions
+        if col > 8:  # Going to the next row
             return self.solve(row + 1, 0)
 
-        if row < 0:  # Unsolvable!
+        if row > 8:  # Finished!
             self.between_iteration()
-            print("Unsolvable")
-            return True
-
-        elif row > 8:  # Finished!
-            self.between_iteration()
-            print("DONE!")
+            self.when_done()
             return True
 
         if (row, col) in self.prepopulated:  # Just move on
             return self.solve(row, col + 1)
 
-        # Guessing
+        # Guessing each number
         for guess in range(1, 10):
             self.grid[row, col] = guess
             self.between_iteration()
@@ -118,6 +111,6 @@ class Sudoku:
 
 
 if __name__ == "__main__":
-    view = CommandView(delay=0.0001)
+    view = CommandView()  # delay=0.0001)
     sudoku = Sudoku(view, sudoku_path="sudokus/2.txt")
     sudoku.solve()
