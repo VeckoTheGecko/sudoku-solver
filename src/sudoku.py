@@ -49,7 +49,7 @@ class Sudoku:
 
         row_index, col_index = last_move
 
-        row = self.grid[row_index, :]  # Contructing the row to be tested
+        row = self.grid[row_index, :]  # Constructing the row to be tested
         col = self.grid[:, col_index]  # Constructing the column to be tested
 
         # Constructing the cell block to be tested
