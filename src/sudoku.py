@@ -8,8 +8,8 @@ class Sudoku:
     def __init__(self, view, sudoku_path=None):
         """A function to initialise the sudoku given a view and a sudoku_path.
 
-        :param view: A view object that is capable of rendering the scene.
-        :param sudoku_path: A string leading to the sudoku text file. 0s represent blank spaces and numbers represent populated spaces."""
+        view: A view object that is capable of rendering the scene.
+        sudoku_path: A string leading to the sudoku text file. 0s represent blank spaces and numbers represent populated spaces."""
 
         self.view = view
 
@@ -72,19 +72,28 @@ class Sudoku:
 
         # All checks passed
         return True
+    
+    def before_iteration(self):
+        """A function that is called before the solving algorithm begins."""
+        self.view.render(self.grid)
 
     def between_iteration(self):
         """A function that is called between a new item is guessed in the sudoku grid."""
-        self.view.render(self.grid)
+        # self.view.render(self.grid)
         return
 
     def when_done(self):
         """A function that is called the final result is determined."""
+        self.view.render(self.grid)
         print("We're done now!!")
         return
 
     def solve(self, row=0, col=0):
         """An implementation of the backtracking algorithm using recursion."""
+        # Implementing before_iteration call
+        if row==0 and col==0:
+            self.before_iteration()
+
         # Defining progression conditions
         if col > 8:  # Going to the next row
             return self.solve(row + 1, 0)
