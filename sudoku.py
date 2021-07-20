@@ -116,7 +116,6 @@ def solve_sudoku(row=0, col=0):
 if __name__ == "__main__":
     grid = read_grid("sudokus/1.txt")
     prepopulated = record_preoccupied_cells(grid)
-
     render(grid)
     solve_sudoku()
     render(grid)
